@@ -1,0 +1,54 @@
+name: Init_25_P5_Releases
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write  # ✅ 关键：允许创建/修改 Release
+
+jobs:
+  init_releases:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}  # ✅ 推荐固定写法
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check gh auth status
+        run: gh auth status
+
+      - name: Install unzip & gh
+        run: sudo apt-get update && sudo apt-get install unzip -y
+
+      - name: Download Seed
+        run: |
+          curl -L -o lotto_ai3_hitmatrix_seed.zip https://github.com/suwei8/LottoAI3_HitMatrix_date/releases/download/v0.1/lotto_ai3_hitmatrix.sql.zip
+          unzip -P ${{ secrets.BACKUP_PASSWORD }} lotto_ai3_hitmatrix_seed.zip -d seed/
+
+      - name: Split & Upload to 25 Releases
+
+        run: |
+          PLAYTYPES=(
+            wanwei_sha3 wanwei_sha1 wanwei_ding5 wanwei_ding3 wanwei_ding1
+            qianwei_sha3 qianwei_sha1 qianwei_ding5 qianwei_ding3 qianwei_ding1
+            baiwei_sha3 baiwei_sha1 baiwei_ding5 baiwei_ding3 baiwei_ding1
+            shiwei_sha3 shiwei_sha1 shiwei_ding5 shiwei_ding3 shiwei_ding1
+            gewei_sha3 gewei_sha1 gewei_ding5 gewei_ding3 gewei_ding1
+          )
+
+          for pt in "${PLAYTYPES[@]}"; do
+            cp seed/lotto_ai3_hitmatrix.sql lotto_ai3_hitmatrix_p5_${pt}.sql
+            zip -P ${{ secrets.BACKUP_PASSWORD }} lotto_ai3_hitmatrix_p5_${pt}.sql.zip lotto_ai3_hitmatrix_p5_${pt}.sql
+
+            # ✅ 如果该 tag 不存在则新建
+            if ! gh release view p5_${pt} --repo suwei8/LottoAI3_HitMatrix_date > /dev/null 2>&1; then
+              gh release create p5_${pt} --repo suwei8/LottoAI3_HitMatrix_date --title "Init p5_${pt}" --notes "初始化玩法 ${pt}"
+            fi
+
+            # ✅ 上传覆盖
+            gh release upload p5_${pt} lotto_ai3_hitmatrix_p5_${pt}.sql.zip --repo suwei8/LottoAI3_HitMatrix_date --clobber
+
+            echo "✅ 已初始化上传 ➜ p5_${pt}"
+          done
