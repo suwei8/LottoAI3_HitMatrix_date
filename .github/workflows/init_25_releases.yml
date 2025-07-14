@@ -43,9 +43,8 @@ jobs:
             zip -P ${{ secrets.BACKUP_PASSWORD }} lotto_ai3_hitmatrix_p5_${pt}.sql.zip lotto_ai3_hitmatrix_p5_${pt}.sql
 
             # ✅ 如果该 tag 不存在则新建
-            if ! gh release view p5_${pt} --repo suwei8/LottoAI3_HitMatrix_date > /dev/null 2>&1; then
-              gh release create p5_${pt} --repo suwei8/LottoAI3_HitMatrix_date --title "Init p5_${pt}" --notes "初始化玩法 ${pt}"
-            fi
+            gh release delete p5_${pt} --yes --repo suwei8/LottoAI3_HitMatrix_date || echo '✅ Release 不存在，跳过删除'
+            gh release create p5_${pt} --repo suwei8/LottoAI3_HitMatrix_date --title "Init p5_${pt}" --notes "初始化玩法 ${pt}"
 
             # ✅ 上传覆盖
             gh release upload p5_${pt} lotto_ai3_hitmatrix_p5_${pt}.sql.zip --repo suwei8/LottoAI3_HitMatrix_date --clobber
