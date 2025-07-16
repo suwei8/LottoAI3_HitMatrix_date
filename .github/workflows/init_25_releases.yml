@@ -39,15 +39,15 @@ jobs:
           )
 
           for pt in "${PLAYTYPES[@]}"; do
-            cp seed/lotto_ai3_hitmatrix.sql lotto_ai3_hitmatrix_p5_${pt}.sql
-            zip -P ${{ secrets.BACKUP_PASSWORD }} lotto_ai3_hitmatrix_p5_${pt}.sql.zip lotto_ai3_hitmatrix_p5_${pt}.sql
+            cp seed/lotto_ai3_hitmatrix.sql tasks_p5_${pt}.sql
+            zip -P ${{ secrets.BACKUP_PASSWORD }} tasks_p5_${pt}.sql.zip tasks_p5_${pt}.sql
 
             # ✅ 如果该 tag 不存在则新建
             gh release delete p5_${pt} --yes --repo suwei8/LottoAI3_HitMatrix_date || echo '✅ Release 不存在，跳过删除'
             gh release create p5_${pt} --repo suwei8/LottoAI3_HitMatrix_date --title "Init p5_${pt}" --notes "初始化玩法 ${pt}"
 
             # ✅ 上传覆盖
-            gh release upload p5_${pt} lotto_ai3_hitmatrix_p5_${pt}.sql.zip --repo suwei8/LottoAI3_HitMatrix_date --clobber
+            gh release upload p5_${pt} tasks_p5_${pt}.sql.zip --repo suwei8/LottoAI3_HitMatrix_date --clobber
 
             echo "✅ 已初始化上传 ➜ p5_${pt}"
           done
