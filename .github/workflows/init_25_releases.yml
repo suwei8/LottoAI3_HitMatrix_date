@@ -24,8 +24,8 @@ jobs:
 
       - name: Download Seed
         run: |
-          curl -L -o lotto_ai3_hitmatrix_seed.zip https://github.com/suwei8/LottoAI3_HitMatrix_date/releases/download/v0.1/lotto_ai3_hitmatrix.sql.zip
-          unzip -P ${{ secrets.BACKUP_PASSWORD }} lotto_ai3_hitmatrix_seed.zip -d seed/
+          curl -L -o tasks_p5.zip https://github.com/suwei8/LottoAI3_HitMatrix_date/releases/download/tasks_p5/tasks_p5.sql.zip
+          unzip -P ${{ secrets.BACKUP_PASSWORD }} tasks_p5.zip -d seed/
 
       - name: Split & Upload to 25 Releases
 
@@ -39,7 +39,7 @@ jobs:
           )
 
           for pt in "${PLAYTYPES[@]}"; do
-            cp seed/lotto_ai3_hitmatrix.sql p5_tasks_${pt}.sql
+            cp seed/tasks_p5.sql p5_tasks_${pt}.sql
             zip -P ${{ secrets.BACKUP_PASSWORD }} p5_tasks_${pt}.sql.zip p5_tasks_${pt}.sql
 
             # ✅ 如果该 tag 不存在则新建
